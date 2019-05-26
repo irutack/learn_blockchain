@@ -71,7 +71,23 @@ class BlockChain(object):
         """
         チェーンの妥当性検証
         """
-        pass
+
+        last_block = chain[0]
+        current_index = 1
+
+        while current_index < len(chain):
+            block = chain[current_index]
+            
+            if block['previous_hash'] != self.hash(last_block):
+                return False
+            
+            if not self.valid_proof(last_block['proof'], block['proof']):
+                return False
+            
+            last_block = block
+            current_index += 1
+        
+        return True
 
 
     def resolve_conflicts(self):
