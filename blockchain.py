@@ -97,6 +97,7 @@ app = Flask(__name__)
 node_identifier = str(uuid4()).replace('-','')
 blockchain = BlockChain()
 
+#  それまでの取引記録を新たなブロックとして追加する
 @app.route('/mine', methods=['GET'])
 def mine():
     last_block = blockchain.last_block
@@ -117,6 +118,7 @@ def mine():
     }
     return jsonify(response), 200
 
+#  取引内容
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.get_json()
@@ -129,6 +131,7 @@ def new_transaction():
     response = {'message': f'Transaction will be added to Block {index}'}
     return jsonify(response), 201
 
+#  ブロックの全体を見る
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
