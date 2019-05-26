@@ -15,7 +15,8 @@ RUN mkdir /workspace
 WORKDIR /workspace
 
 # Install pylint
-RUN pip install pylint
+RUN pip install pylint \
+    && pip install Flask==0.12.2 requests==2.18.4
 
 # Install Python dependencies from requirements.txt if it exists
 COPY .devcontainer/requirements.txt.temp requirements.txt* /workspace/
