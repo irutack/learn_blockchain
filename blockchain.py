@@ -1,7 +1,9 @@
 import hashlib
 import json
+import requests
 from textwrap import dedent
 from time import time
+from urllib.parse import urlparse
 from uuid import uuid4
 
 from flask import Flask, jsonify, request
@@ -10,9 +12,11 @@ class BlockChain(object):
     def __init__(self):
         self.chain = []
         self.current_transactions = []
+        self.nodes = set()
 
         #  ジェネシスブロックを作る
         self.new_block(proof=100, previous_hash=1)
+
 
     def new_block(self, proof, previous_hash=None):
         
@@ -36,6 +40,7 @@ class BlockChain(object):
         self.chain.append(block)
         return block
 
+
     def new_transaction(self, sender, recipient, amount):
         """
         :param sender: <str> 送信者アドレス
@@ -52,6 +57,30 @@ class BlockChain(object):
 
         return self.last_block['index'] + 1
 
+
+    def register_node(self, address):
+        """
+        :param address: <str> ほかのネットワークノードのアドレス
+        :return: None
+        """
+        parsed_url = urlparse(address)
+        self.nodes.add(parsed_url.netloc)
+
+
+    def valid_chain(self, chain):
+        """
+        チェーンの妥当性検証
+        """
+        pass
+
+
+    def resolve_conflicts(self):
+        """
+        より長い妥当なチェーンに置き換える
+        """
+        pass
+
+
     @staticmethod
     def hash(block):
         """
@@ -66,6 +95,7 @@ class BlockChain(object):
     @property
     def last_block(self):
         return self.chain[-1]
+
 
     def proof_of_work(self, last_proof):
         """
@@ -83,6 +113,7 @@ class BlockChain(object):
         
         return proof
 
+
     @staticmethod
     def valid_proof(last_proof, proof):
         """
@@ -93,9 +124,11 @@ class BlockChain(object):
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
 
+
 app = Flask(__name__)
 node_identifier = str(uuid4()).replace('-','')
 blockchain = BlockChain()
+
 
 #  それまでの取引記録を新たなブロックとして追加する
 @app.route('/mine', methods=['GET'])
@@ -118,6 +151,7 @@ def mine():
     }
     return jsonify(response), 200
 
+
 #  取引内容
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
@@ -130,6 +164,7 @@ def new_transaction():
     index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
     response = {'message': f'Transaction will be added to Block {index}'}
     return jsonify(response), 201
+
 
 #  ブロックの全体を見る
 @app.route('/chain', methods=['GET'])
