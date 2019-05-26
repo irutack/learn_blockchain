@@ -97,7 +97,7 @@ app = Flask(__name__)
 node_identifier = str(uuid4()).replace('-','')
 blockchain = BlockChain()
 
-@app.route('/mine', method=['GET'])
+@app.route('/mine', methods=['GET'])
 def mine():
     last_block = blockchain.last_block
     last_proof = last_block['proof']
@@ -117,7 +117,7 @@ def mine():
     }
     return jsonify(response), 200
 
-@app.route('/transactions/new', method=['POST'])
+@app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.get_json()
 
@@ -129,7 +129,7 @@ def new_transaction():
     response = {'message': f'Transaction will be added to Block {index}'}
     return jsonify(response), 201
 
-@app.route('/chain', method=['GET'])
+@app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
         'chain': blockchain.chain,
