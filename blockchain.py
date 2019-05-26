@@ -11,7 +11,7 @@ class BlockChain(object):
         self.chain = []
         self.current_transactions = []
 
-        # ジェネシスブロックを作る
+        #  ジェネシスブロックを作る
         self.new_block(proof=100, previous_hash=1)
 
     def new_block(self, proof, previous_hash=None):
@@ -99,7 +99,23 @@ blockchain = BlockChain()
 
 @app.route('/mine', method=['GET'])
 def mine():
-    return "mine!"
+    last_block = blockchain.last_block
+    last_proof = last_block['proof']
+    proof = blockchain.proof_of_work(last_proof)
+
+    blockchain.new_transaction(sender="0", recipient=node_identifier, amount=1)
+
+    previous_hash = blockchain.hash(last_block)
+    block = blockchain.new_block(proof, previous_hash)
+    
+    response = {
+        'message': "New Block",
+        'index': block['index'],
+        'transactions': block['transactions'],
+        'proof': block['proof'],
+        'previous_hash': block['previous_hash'],
+    }
+    return jsonify(response), 200
 
 @app.route('/transactions/new', method=['POST'])
 def new_transaction():
