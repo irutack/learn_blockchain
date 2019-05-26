@@ -234,7 +234,7 @@ def register_nodes():
 #  ネットワークの同期(conflict解消)
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
-    replaced = blockchain.resolve_conflict()
+    replaced = blockchain.resolve_conflicts()
 
     if replaced:
         return jsonify({
