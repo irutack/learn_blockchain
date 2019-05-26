@@ -231,5 +231,22 @@ def register_nodes():
     return jsonify(response), 201
 
 
+#  ネットワークの同期(conflict解消)
+@app.route('/nodes/resolve', methods=['GET'])
+def consensus():
+    replaced = blockchain.resolve_conflict()
+
+    if replaced:
+        return jsonify({
+            'message':'replaced!',
+            'new_chain':blockchain.chain
+        }), 200
+    else:
+        return jsonify({
+            'message': 'our chain is up-to-date',
+            'chain': blockchain.chain
+        })
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
