@@ -1,6 +1,10 @@
 import hashlib
 import json
+from textwrap import dedent
 from time import time
+from uuid import uuid4
+
+from flask import Flask
 
 class BlockChain(object):
     def __init__(self):
@@ -89,5 +93,26 @@ class BlockChain(object):
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
 
-tmp = BlockChain()
-tmp.new_transaction(sender='alice',recipient='bob',amount=100)
+app = Flask(__name__)
+node_identifier = str(uuid4()).replace('-','')
+blockchain = BlockChain()
+
+@app.route('/mine', method=['GET'])
+def mine():
+    return "mine!"
+
+@app.route('/transactions/new', method=['POST'])
+def new_transaction():
+    return "new tran"
+
+@app.route('/chain', method=['GET'])
+def full_chain():
+    response = {
+        'chain': blockchain.chain,
+        'length': len(blockchain.chain)
+    }
+    return jsonify(response), 200
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
