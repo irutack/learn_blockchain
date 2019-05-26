@@ -42,7 +42,7 @@ class BlockChain(object):
         :param recipient: <str> 受信者アドレス
         :param amount: <int>
 
-        :return: <int> 次のマイニングで用いられるindex
+        :return: <int> 次のBlockに使われるindex
         """
         self.current_transactions.append({
             'sender': sender,
@@ -103,7 +103,15 @@ def mine():
 
 @app.route('/transactions/new', method=['POST'])
 def new_transaction():
-    return "new tran"
+    values = request.get_json()
+
+    required = ['sender', 'recipient', 'amount']
+    if not all(k in values for k in required):
+        return "Missing value", 400
+
+    index = blockchain.new_transaction(values['sender'], values['recipient'], values['amount'])
+    response = {'message': f'Transaction will be added to Block {index}'}
+    return jsonify(response), 201
 
 @app.route('/chain', method=['GET'])
 def full_chain():
